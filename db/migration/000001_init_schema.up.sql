@@ -1,0 +1,25 @@
+CREATE TABLE "exhibitions" (
+    "id" bigserial PRIMARY KEY,
+    "title" varchar(30) NOT NULL,
+    "en_title" varchar(60), 
+    "subtitle" varchar(30),
+    "en_subtitle" varchar(60),
+    "start_date" varchar(10) NOT NULL,
+    "end_date" varchar(10),
+    "draft" boolean NOT NULL DEFAULT true,
+    "host" varchar(30) NOT NULL,
+    "en_host" varchar(60),
+    "performer" json,
+    "location" varchar(30),
+    "en_location" varchar(60),
+    "daily_start_time" varchar(5),
+    "daily_end_time" varchar(5),
+    "category" varchar(20) NOT NULL,
+    "description" varchar(100) NOT NULL,
+    "en_description" varchar(200),
+    "content" text NOT NULL,
+    "en_content" text,
+    "create_at" bigint NOT NULL,
+    "update_at" bigint NOT NULL
+    
+);

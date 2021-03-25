@@ -30,3 +30,10 @@ func TestRouterMethod(t *testing.T) {
 	w = performRequest(router, http.MethodDelete, "/api/v1/exhibitions/1")
 	assert.Equal(t, http.StatusOK, w.Code)
 }
+
+/*
+func TestExhibitionService(t *testing.T) {
+	store := NewMockStore()
+	svc := NewExhibitionSvc(store)
+}
+*/

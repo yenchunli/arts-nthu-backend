@@ -8,8 +8,9 @@ import (
 
 type Server struct {
 	config Config
-	store  Store
+	store  Store	// Database Interface
 	router *gin.Engine
+	//email EmailSender
 }
 
 func NewServer(config Config, store Store, router *gin.Engine) *Server {
