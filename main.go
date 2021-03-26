@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
+	db "github.com/yenchunli/go-nthu-artscenter-server/db"
 	"log"
 )
 
@@ -11,7 +13,10 @@ func main() {
 		log.Fatal("cannot load config:", err)
 	}
 
-	conn, err := sql.Open(config.DBDriver, config.DBSource)
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
+	fmt.Println(psqlInfo)
+	conn, err := sql.Open(config.DBDriver, psqlInfo)
 
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
@@ -24,7 +29,7 @@ func main() {
 		panic(err)
 	}
 
-	store := NewStore(conn)
+	store := db.NewDB(conn)
 	router := NewRouter(store)
 	server := NewServer(config, store, router)
 

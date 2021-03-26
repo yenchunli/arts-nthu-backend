@@ -1,16 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
 	"github.com/gin-gonic/gin"
+	store "github.com/yenchunli/go-nthu-artscenter-server/store"
 	"net/http"
 )
 
 type ExhibitionSvc struct {
-	store Store
+	store store.Store
 }
 
-func NewRouter(store Store) *gin.Engine {
+func NewRouter(store store.Store) *gin.Engine {
 	r := gin.New()
 
 	r.Use(gin.Logger())
@@ -30,22 +31,61 @@ func NewRouter(store Store) *gin.Engine {
 	return r
 }
 
-func NewExhibitionSvc(store Store) *ExhibitionSvc {
+func NewExhibitionSvc(store store.Store) *ExhibitionSvc {
 	return &ExhibitionSvc{store: store}
 }
 
+func errorResponse(err error) gin.H {
+	return gin.H{"error": err.Error()}
+}
+
 func (svc *ExhibitionSvc) List(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "List Exhibitions",
-	})
+	type request struct {
+		Start int32 `form:"start" binding:"required,min=1`
+		Size  int32 `form:"size" binding:"required,min=6, max=12`
+	}
+	var req request
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := store.ListExhibitionsParams{
+		Limit:  req.Size,
+		Offset: (req.Start - 1) * req.Size,
+	}
+
+	exhibitions, err := svc.store.ListExhibitions(arg)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, exhibitions)
 }
 
 func (svc *ExhibitionSvc) Get(c *gin.Context) {
-	exhibition, _ := svc.store.GetExhibition(1)
-	fmt.Println(exhibition)
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Get Exhibition",
-	})
+	type request struct {
+		ID int8 `uri:"id" binding:"required,min=1"`
+	}
+	var req request
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	exhibition, err := svc.store.GetExhibition(req.ID)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, exhibition)
 }
 
 func (svc *ExhibitionSvc) Create(c *gin.Context) {

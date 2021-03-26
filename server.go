@@ -2,18 +2,19 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/yenchunli/go-nthu-artscenter-server/store"
 	"net/http"
 	"time"
 )
 
 type Server struct {
 	config Config
-	store  Store	// Database Interface
+	store  store.Store // Database Interface
 	router *gin.Engine
 	//email EmailSender
 }
 
-func NewServer(config Config, store Store, router *gin.Engine) *Server {
+func NewServer(config Config, store store.Store, router *gin.Engine) *Server {
 	return &Server{
 		config: config,
 		store:  store,
