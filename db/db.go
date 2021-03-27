@@ -71,7 +71,7 @@ func (db *DB) ListExhibitions(arg store.ListExhibitionsParams) ([]store.Exhibiti
 	return items, err
 }
 
-func (db *DB) GetExhibition(id int8) (exhibition store.Exhibition, err error) {
+func (db *DB) GetExhibition(id int32) (exhibition store.Exhibition, err error) {
 	const command = `
 	SELECT * FROM exhibitions WHERE id=$1`
 
@@ -226,13 +226,95 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 	return e, err
 }
 
-func (db *DB) EditExhibitions() (store.Exhibition, error) {
-	var exhibition store.Exhibition
-	var err error
-	return exhibition, err
+func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition, error) {
+	const command = `
+	UPDATE exhibitions
+	SET title=$2,
+	title_en=$3,
+	subtitle=$4,
+	subtitle_en=$5,
+	start_date=$6,
+	end_date=$7,
+	draft=$8,
+	host=$9,
+	host_en=$10,
+	performer=$11,
+	location=$12,
+	location_en=$13,
+	daily_start_time=$14,
+	daily_end_time=$15,
+	category=$16,
+	description=$17,
+	description_en=$18,
+	content=$19,
+	content_en=$20,
+	update_at=$21
+	WHERE id = $1
+	RETURNING id,title,title_en,subtitle,subtitle_en,start_date,end_date,draft,host,host_en,performer,location,location_en,daily_start_time,daily_end_time,category,description,description_en,content,content_en,create_at,update_at
+	`
+	
+	currentTime := time.Now().Unix()
+	row := db.conn.QueryRow(command,
+		arg.ID,
+		arg.Title,
+		arg.TitleEn,
+		arg.Subtitle,
+		arg.SubtitleEn,
+		arg.StartDate,
+		arg.EndDate,
+		arg.Draft,
+		arg.Host,
+		arg.HostEn,
+		arg.Performer,
+		arg.Location,
+		arg.LocationEn,
+		arg.DailyStartTime,
+		arg.DailyEndTime,
+		arg.Category,
+		arg.Description,
+		arg.DescriptionEn,
+		arg.Content,
+		arg.ContentEn,
+		currentTime,
+	)
+	
+	var e store.Exhibition
+
+	err := row.Scan(
+		&e.ID,
+		&e.Title,
+		&e.TitleEn,
+		&e.Subtitle,
+		&e.SubtitleEn,
+		&e.StartDate,
+		&e.EndDate,
+		&e.Draft,
+		&e.Host,
+		&e.HostEn,
+		&e.Performer,
+		&e.Location,
+		&e.LocationEn,
+		&e.DailyStartTime,
+		&e.DailyEndTime,
+		&e.Category,
+		&e.Description,
+		&e.DescriptionEn,
+		&e.Content,
+		&e.ContentEn,
+		&e.CreateAt,
+		&e.UpdateAt,
+	)
+	return e, err
 }
 
-func (db *DB) DeleteExhibition() error {
-	var err error
+func (db *DB) DeleteExhibition(id int32) error {
+
+	const command = `
+	DELETE FROM exhibitions
+	WHERE id = $1
+	`
+
+	_, err := db.conn.Exec(command, id)
+	
 	return err
 }

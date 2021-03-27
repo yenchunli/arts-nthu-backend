@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	//"fmt"
 	"github.com/gin-gonic/gin"
 	store "github.com/yenchunli/go-nthu-artscenter-server/store"
 	"net/http"
+	"strconv"
 )
 
 type ExhibitionSvc struct {
@@ -67,7 +69,7 @@ func (svc *ExhibitionSvc) List(c *gin.Context) {
 
 func (svc *ExhibitionSvc) Get(c *gin.Context) {
 	type request struct {
-		ID int8 `uri:"id" binding:"required,min=1"`
+		ID int32 `uri:"id" binding:"required,min=1"`
 	}
 	var req request
 	if err := c.ShouldBindUri(&req); err != nil {
@@ -149,13 +151,82 @@ func (svc *ExhibitionSvc) Create(c *gin.Context) {
 }
 
 func (svc *ExhibitionSvc) Edit(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Edit Exhibition",
-	})
+	type request struct {
+		Title          string          `json:"title"`
+		TitleEn        string          `json:"title_en"`
+		Subtitle       string          `json:"subtitle"`
+		SubtitleEn     string          `json:"subtitle_en"`
+		StartDate      string          `json:"start_date"`
+		EndDate        string          `json:"end_date"`
+		Draft          bool            `json:"draft"`
+		Host           string          `json:"host"`
+		HostEn         string          `json:"host_en"`
+		Performer      store.Performer `json:"performer"`
+		Location       string          `json:"location"`
+		LocationEn     string          `json:"location_en"`
+		DailyStartTime string          `json:"daily_start_time"`
+		DailyEndTime   string          `json:"daily_end_time"`
+		Category       string          `json:"category"`
+		Description    string          `json:"description"`
+		DescriptionEn  string          `json:"description_en"`
+		Content        string          `json:"content"`
+		ContentEn      string          `json:"content_en"`
+	}
+
+	var req request
+	id, err := strconv.ParseInt(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := store.EditExhibitionParams{
+		ID:             int32(id),
+		Title:          req.Title,
+		TitleEn:        req.TitleEn,
+		Subtitle:       req.Subtitle,
+		SubtitleEn:     req.SubtitleEn,
+		StartDate:      req.StartDate,
+		EndDate:        req.EndDate,
+		Draft:          req.Draft,
+		Host:           req.Host,
+		HostEn:         req.HostEn,
+		Performer:      req.Performer,
+		Location:       req.Location,
+		LocationEn:     req.LocationEn,
+		DailyStartTime: req.DailyStartTime,
+		DailyEndTime:   req.DailyEndTime,
+		Category:       req.Category,
+		Description:    req.Description,
+		DescriptionEn:  req.DescriptionEn,
+		Content:        req.Content,
+		ContentEn:      req.ContentEn,
+	}
+	exhibition, err := svc.store.EditExhibitions(arg)
+
+	if err != nil {
+
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, exhibition)
 }
 
 func (svc *ExhibitionSvc) Delete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Delete Exhibition",
-	})
+
+	id, err := strconv.ParseInt(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	if svc.store.DeleteExhibition(int32(id)); err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{})
 }

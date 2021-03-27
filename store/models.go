@@ -29,7 +29,7 @@ func (p *Performer) Scan(value interface{}) error {
 }
 
 type Exhibition struct {
-	ID             int64     `json:"id"`
+	ID             int32     `json:"id"`
 	Title          string    `json:"title"`
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
@@ -78,4 +78,27 @@ type CreateExhibitionParams struct {
 type ListExhibitionsParams struct {
 	Limit int32 `json:"limit"`
 	Offset int32 `json:"offset"`
+}
+
+type EditExhibitionParams struct {
+	ID			   int32	 `json:"id"`
+	Title          string    `json:"title"`
+	TitleEn        string    `json:"title_en"`
+	Subtitle       string    `json:"subtitle"`
+	SubtitleEn     string    `json:"subtitle_en"`
+	StartDate      string    `json:"start_date"`
+	EndDate        string    `json:"end_date"`
+	Draft          bool      `json:"draft"`
+	Host           string    `json:"host"`
+	HostEn         string    `json:"host_en"`
+	Performer      Performer `json:"performer"`
+	Location       string    `json:"location"`
+	LocationEn     string    `json:"location_en"`
+	DailyStartTime string    `json:"daily_start_time"`
+	DailyEndTime   string    `json:"daily_end_time"`
+	Category       string    `json:"category"`
+	Description    string    `json:"description"`
+	DescriptionEn  string    `json:"description_en"`
+	Content        string    `json:"content"`
+	ContentEn      string    `json:"content_en"`
 }
