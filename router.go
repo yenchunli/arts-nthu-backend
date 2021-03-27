@@ -89,9 +89,63 @@ func (svc *ExhibitionSvc) Get(c *gin.Context) {
 }
 
 func (svc *ExhibitionSvc) Create(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Create Exhibition",
-	})
+	type request struct {
+		Title          string          `json:"title" binding:"required"`
+		TitleEn        string          `json:"title_en"`
+		Subtitle       string          `json:"subtitle" binding:"required"`
+		SubtitleEn     string          `json:"subtitle_en"`
+		StartDate      string          `json:"start_date" binding:"required"`
+		EndDate        string          `json:"end_date"`
+		Draft          bool            `json:"draft"`
+		Host           string          `json:"host"`
+		HostEn         string          `json:"host_en"`
+		Performer      store.Performer `json:"performer"`
+		Location       string          `json:"location"`
+		LocationEn     string          `json:"location_en"`
+		DailyStartTime string          `json:"daily_start_time"`
+		DailyEndTime   string          `json:"daily_end_time"`
+		Category       string          `json:"category" binding:"required"`
+		Description    string          `json:"description" binding:"required"`
+		DescriptionEn  string          `json:"description_en"`
+		Content        string          `json:"content" binding:"required"`
+		ContentEn      string          `json:"content_en"`
+	}
+	var req request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := store.CreateExhibitionParams{
+		Title:          req.Title,
+		TitleEn:        req.TitleEn,
+		Subtitle:       req.Subtitle,
+		SubtitleEn:     req.SubtitleEn,
+		StartDate:      req.StartDate,
+		EndDate:        req.EndDate,
+		Draft:          req.Draft,
+		Host:           req.Host,
+		HostEn:         req.HostEn,
+		Performer:      req.Performer,
+		Location:       req.Location,
+		LocationEn:     req.LocationEn,
+		DailyStartTime: req.DailyStartTime,
+		DailyEndTime:   req.DailyEndTime,
+		Category:       req.Category,
+		Description:    req.Description,
+		DescriptionEn:  req.DescriptionEn,
+		Content:        req.Content,
+		ContentEn:      req.ContentEn,
+	}
+
+	exhibition, err := svc.store.CreateExhibition(arg)
+	if err != nil {
+
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, exhibition)
 }
 
 func (svc *ExhibitionSvc) Edit(c *gin.Context) {

@@ -54,7 +54,6 @@ type Exhibition struct {
 }
 
 type CreateExhibitionParams struct {
-	ID             int64     `json:"id"`
 	Title          string    `json:"title"`
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`

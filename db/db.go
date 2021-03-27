@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	store "github.com/yenchunli/go-nthu-artscenter-server/store"
 	_ "github.com/lib/pq"
+	"time"
+	"fmt"
 )
 
 type DB struct {
@@ -145,12 +147,32 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		description,
 		description_en,
 		content,
-		content_en
+		content_en,
+		create_at,
+		update_at
 	) VALUES (
-		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-	)
+		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
+	) RETURNING id,title,title_en,subtitle,
+	subtitle_en,
+	start_date,
+	end_date,
+	draft,
+	host,
+	host_en,
+	performer,
+	location,
+	location_en,
+	daily_start_time,
+	daily_end_time,
+	category,
+	description,
+	description_en,
+	content,
+	content_en,
+	create_at,
+	update_at
 	`
-
+	currentTime := time.Now().Unix()
 	row := db.conn.QueryRow(command,
 		arg.Title,
 		arg.TitleEn,
@@ -171,10 +193,14 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		arg.DescriptionEn,
 		arg.Content,
 		arg.ContentEn,
+		currentTime,
+		currentTime,
 	)
+	fmt.Println(arg.Draft)
 	var e store.Exhibition
 
 	err := row.Scan(
+		&e.ID,
 		&e.Title,
 		&e.TitleEn,
 		&e.Subtitle,
@@ -194,6 +220,8 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		&e.DescriptionEn,
 		&e.Content,
 		&e.ContentEn,
+		&e.CreateAt,
+		&e.UpdateAt,
 	)
 	return e, err
 }

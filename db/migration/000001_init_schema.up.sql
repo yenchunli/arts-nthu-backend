@@ -1,6 +1,6 @@
 CREATE TABLE "exhibitions" (
     "id" bigserial PRIMARY KEY,
-    "title" varchar(30) NOT NULL,
+    "title" varchar(30) NOT NULL UNIQUE,
     "title_en" varchar(60) DEFAULT '', 
     "subtitle" varchar(30) DEFAULT '',
     "subtitle_en" varchar(60) DEFAULT '',
