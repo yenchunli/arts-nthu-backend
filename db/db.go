@@ -248,9 +248,9 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 	description_en=$18,
 	content=$19,
 	content_en=$20,
-	update_at=$21
+	updated_at=$21
 	WHERE id = $1
-	RETURNING id,title,title_en,subtitle,subtitle_en,start_date,end_date,draft,host,host_en,performer,location,location_en,daily_start_time,daily_end_time,category,description,description_en,content,content_en,create_at,update_at
+	RETURNING id,title,title_en,subtitle,subtitle_en,start_date,end_date,draft,host,host_en,performer,location,location_en,daily_start_time,daily_end_time,category,description,description_en,content,content_en,create_at,updated_at
 	`
 	
 	currentTime := time.Now().Unix()
@@ -320,13 +320,53 @@ func (db *DB) DeleteExhibition(id int32) error {
 }
 
 func (db *DB) CreateUser(arg store.CreateUserParams) (store.User, error) {
+	const command = `
+	INSERT INTO users (
+		username,
+		hashed_password,
+		full_name,
+		email,
+		password_change_at,
+		create_at
+	  ) VALUES (
+		$1, $2, $3, $4, $5, $6
+	  ) RETURNING username, hashed_password, full_name, email, password_change_at, create_at
+	`
+	currentTime := time.Now().Unix()
+	row := db.conn.QueryRow(command,
+		arg.Username,
+		arg.HashedPassword,
+		arg.FullName,
+		arg.Email,
+		currentTime,
+		currentTime,
+	)
 	var user store.User
-	var err error
+	err := row.Scan(
+		&user.Username,
+		&user.HashedPassword,
+		&user.FullName,
+		&user.Email,
+		&user.PasswordChangeAt,
+		&user.CreateAt,
+	)
 	return user, err
 }
 
 func (db *DB) GetUser(username string) (store.User, error) {
+	const command = `
+	SELECT username, hashed_password, full_name, email, password_change_at, create_at FROM users
+	WHERE username = $1 LIMIT 1
+	`
+	row := db.conn.QueryRow(command, username)
 	var user store.User
-	var err error
+	err := row.Scan(
+		&user.Username,
+		&user.HashedPassword,
+		&user.FullName,
+		&user.Email,
+		&user.PasswordChangeAt,
+		&user.CreateAt,
+	)
 	return user, err
 }

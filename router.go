@@ -5,36 +5,150 @@ import (
 	//"fmt"
 	"github.com/gin-gonic/gin"
 	store "github.com/yenchunli/go-nthu-artscenter-server/store"
+	"github.com/yenchunli/go-nthu-artscenter-server/token"
+	"github.com/yenchunli/go-nthu-artscenter-server/util"
+	"github.com/yenchunli/go-nthu-artscenter-server/middleware"
 	"net/http"
 	"strconv"
 )
 
 type ExhibitionSvc struct {
 	store store.Store
+	tokenMaker token.Maker
+	config Config
 }
 
-func NewRouter(store store.Store) *gin.Engine {
+type UserSvc struct {
+	store store.Store
+	tokenMaker token.Maker
+	config Config
+}
+
+func NewRouter(config Config, store store.Store, tokenMaker token.Maker) *gin.Engine {
 	r := gin.New()
 
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	exhibitionSvc := NewExhibitionSvc(store)
+	exhibitionSvc := NewExhibitionSvc(store, tokenMaker, config)
+	userSvc := NewUserSvc(store, tokenMaker, config)
 
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.GET("/exhibitions", exhibitionSvc.List)
 		apiv1.GET("/exhibitions/:id", exhibitionSvc.Get)
-		apiv1.POST("/exhibitions", exhibitionSvc.Create)
-		apiv1.PUT("/exhibitions/:id", exhibitionSvc.Edit)
-		apiv1.DELETE("/exhibitions/:id", exhibitionSvc.Delete)
+
+		apiv1.POST("/users", userSvc.Create)
+		apiv1.POST("/users/login", userSvc.Login)
 	}
+
+	apiv1_auth := r.Group("/api/v1").Use(middleware.JWT(tokenMaker))
+	{
+		apiv1_auth.POST("/exhibitions", exhibitionSvc.Create)
+		apiv1_auth.PUT("/exhibitions/:id", exhibitionSvc.Edit)
+		apiv1_auth.DELETE("/exhibitions/:id", exhibitionSvc.Delete)
+	}
+
 
 	return r
 }
 
-func NewExhibitionSvc(store store.Store) *ExhibitionSvc {
-	return &ExhibitionSvc{store: store}
+func NewUserSvc(store store.Store, tokenMaker token.Maker, config Config) *UserSvc {
+	return &UserSvc{store: store, tokenMaker: tokenMaker, config: config,}
+}
+
+func (svc *UserSvc) Create(ctx *gin.Context) {
+	type request struct {
+		Username string `json:"username" binding:"required,alphanum"`
+		Password string `json:"password" binding:"required,min=6"`
+		FullName string `json:"full_name" binding:"required"`
+		Email    string `json:"email" binding:"required,email"`
+	}
+	type response struct {
+		Username         string `json:"username"`
+		FullName         string `json:"full_name"`
+		Email            string `json:"email"`
+		PasswordChangeAt int64  `json:"password_change_at"`
+		CreatedAt        int64  `json:"created_at"`
+	}
+	var req request
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	hashedPassword, err := util.HashPassword(req.Password)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := store.CreateUserParams{
+		Username:       req.Username,
+		HashedPassword: hashedPassword,
+		FullName:       req.FullName,
+		Email:          req.Email,
+	}
+	user, err := svc.store.CreateUser(arg)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
+
+func (svc *UserSvc) Login(ctx *gin.Context) {
+	type request struct {
+		Username string `json:"username" binding:"required,alphanum"`
+		Password string `json:"password" binding:"required,min=6"`
+	}
+	type response struct {
+		AccessToken string `json:"access_token"`
+		Username    string `json:"username"`
+	}
+
+	var req request
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := svc.store.GetUser(req.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = util.CheckPassword(req.Password, user.HashedPassword)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	accessToken, err := svc.tokenMaker.CreateToken(
+		user.Username,
+		svc.config.AccessTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	res := response{
+		AccessToken: accessToken,
+		Username:    user.Username,
+	}
+	ctx.JSON(http.StatusOK, res)
+}
+
+func NewExhibitionSvc(store store.Store, tokenMaker token.Maker, config Config) *ExhibitionSvc {
+	return &ExhibitionSvc{store: store, tokenMaker: tokenMaker, config: config,}
 }
 
 func errorResponse(err error) gin.H {

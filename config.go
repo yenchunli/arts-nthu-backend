@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/spf13/viper"
+	"time"
 )
 
 type Config struct {
@@ -12,6 +13,8 @@ type Config struct {
 	DBPassword    string `mapstructure:"DB_PASSWORD"`
 	DBName        string `mapstructure:"DB_NAME"`
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	JWTTokenKey   string `mapstructure:"JWT_TOKEN_KEY"`
+	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

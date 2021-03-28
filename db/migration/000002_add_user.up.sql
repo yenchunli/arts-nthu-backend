@@ -3,6 +3,6 @@ CREATE TABLE "users" (
   "hashed_password" varchar NOT NULL,
   "full_name" varchar NOT NULL,
   "email" varchar UNIQUE NOT NULL,
-  "password_changed_at" bigint NOT NULL,  
-  "created_at" bigint NOT NULL
+  "password_change_at" bigint NOT NULL,  
+  "create_at" bigint NOT NULL
 );

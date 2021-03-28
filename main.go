@@ -30,8 +30,7 @@ func main() {
 	}
 
 	store := db.NewDB(conn)
-	router := NewRouter(store)
-	server := NewServer(config, store, router)
+	server, _ := NewServer(config, store)
 
 	server.Run()
 }

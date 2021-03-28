@@ -108,8 +108,8 @@ type User struct {
 	HashedPassword    string    `json:"hashed_password"`
 	FullName          string    `json:"full_name"`
 	Email             string    `json:"email"`
-	PasswordChangedAt int64 	`json:"password_changed_at"`
-	CreatedAt         int64 	`json:"created_at"`
+	PasswordChangeAt int64 	`json:"password_change_at"`
+	CreateAt         int64 	`json:"create_at"`
 }
 
 type CreateUserParams struct {

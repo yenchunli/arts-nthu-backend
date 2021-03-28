@@ -3,23 +3,33 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/yenchunli/go-nthu-artscenter-server/store"
+	"github.com/yenchunli/go-nthu-artscenter-server/token"
 	"net/http"
 	"time"
+	"fmt"
 )
 
 type Server struct {
 	config Config
 	store  store.Store // Database Interface
 	router *gin.Engine
-	//email EmailSender
+	tokenMaker token.Maker
 }
 
-func NewServer(config Config, store store.Store, router *gin.Engine) *Server {
+func NewServer(config Config, store store.Store) (*Server, error) {
+	tokenMaker, err := token.NewJWTMaker(config.JWTTokenKey)
+	router := NewRouter(config, store, tokenMaker)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+
 	return &Server{
 		config: config,
 		store:  store,
+		tokenMaker: tokenMaker,
 		router: router,
-	}
+	}, nil
+	
 }
 
 func (server *Server) Run() {
