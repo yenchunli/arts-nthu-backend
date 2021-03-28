@@ -318,3 +318,15 @@ func (db *DB) DeleteExhibition(id int32) error {
 	
 	return err
 }
+
+func (db *DB) CreateUser(arg store.CreateUserParams) (store.User, error) {
+	var user store.User
+	var err error
+	return user, err
+}
+
+func (db *DB) GetUser(username string) (store.User, error) {
+	var user store.User
+	var err error
+	return user, err
+}

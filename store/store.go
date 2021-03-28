@@ -6,4 +6,7 @@ type Store interface {
 	CreateExhibition(arg CreateExhibitionParams) (Exhibition, error)
 	EditExhibitions(arg EditExhibitionParams) (Exhibition, error)
 	DeleteExhibition(id int32) error
+
+	CreateUser(arg CreateUserParams) (User, error)
+	GetUser(username string) (User, error)
 }

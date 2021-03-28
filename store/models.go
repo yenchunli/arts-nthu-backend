@@ -102,3 +102,19 @@ type EditExhibitionParams struct {
 	Content        string    `json:"content"`
 	ContentEn      string    `json:"content_en"`
 }
+
+type User struct {
+	Username          string    `json:"username"`
+	HashedPassword    string    `json:"hashed_password"`
+	FullName          string    `json:"full_name"`
+	Email             string    `json:"email"`
+	PasswordChangedAt int64 	`json:"password_changed_at"`
+	CreatedAt         int64 	`json:"created_at"`
+}
+
+type CreateUserParams struct {
+	Username       string `json:"username"`
+	HashedPassword string `json:"hashed_password"`
+	FullName       string `json:"full_name"`
+	Email          string `json:"email"`
+}

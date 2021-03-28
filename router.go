@@ -41,14 +41,14 @@ func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
 
-func (svc *ExhibitionSvc) List(c *gin.Context) {
+func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 	type request struct {
 		Start int32 `form:"start" binding:"required,min=1`
 		Size  int32 `form:"size" binding:"required,min=6, max=12`
 	}
 	var req request
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
@@ -60,37 +60,37 @@ func (svc *ExhibitionSvc) List(c *gin.Context) {
 	exhibitions, err := svc.store.ListExhibitions(arg)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, exhibitions)
+	ctx.JSON(http.StatusOK, exhibitions)
 }
 
-func (svc *ExhibitionSvc) Get(c *gin.Context) {
+func (svc *ExhibitionSvc) Get(ctx *gin.Context) {
 	type request struct {
 		ID int32 `uri:"id" binding:"required,min=1"`
 	}
 	var req request
-	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 	exhibition, err := svc.store.GetExhibition(req.ID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, errorResponse(err))
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, exhibition)
+	ctx.JSON(http.StatusOK, exhibition)
 }
 
-func (svc *ExhibitionSvc) Create(c *gin.Context) {
+func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 	type request struct {
 		Title          string          `json:"title" binding:"required"`
 		TitleEn        string          `json:"title_en"`
@@ -113,8 +113,8 @@ func (svc *ExhibitionSvc) Create(c *gin.Context) {
 		ContentEn      string          `json:"content_en"`
 	}
 	var req request
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
@@ -143,14 +143,14 @@ func (svc *ExhibitionSvc) Create(c *gin.Context) {
 	exhibition, err := svc.store.CreateExhibition(arg)
 	if err != nil {
 
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, exhibition)
+	ctx.JSON(http.StatusOK, exhibition)
 }
 
-func (svc *ExhibitionSvc) Edit(c *gin.Context) {
+func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 	type request struct {
 		Title          string          `json:"title"`
 		TitleEn        string          `json:"title_en"`
@@ -174,13 +174,13 @@ func (svc *ExhibitionSvc) Edit(c *gin.Context) {
 	}
 
 	var req request
-	id, err := strconv.ParseInt(c.Param("id"), 10, 32)
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
@@ -210,23 +210,23 @@ func (svc *ExhibitionSvc) Edit(c *gin.Context) {
 
 	if err != nil {
 
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, exhibition)
+	ctx.JSON(http.StatusOK, exhibition)
 }
 
-func (svc *ExhibitionSvc) Delete(c *gin.Context) {
+func (svc *ExhibitionSvc) Delete(ctx *gin.Context) {
 
-	id, err := strconv.ParseInt(c.Param("id"), 10, 32)
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
 	if svc.store.DeleteExhibition(int32(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{})
+	ctx.JSON(http.StatusOK, gin.H{})
 }
