@@ -208,8 +208,10 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 	type request struct {
 		Title          string          `json:"title" binding:"required"`
 		TitleEn        string          `json:"title_en"`
-		Subtitle       string          `json:"subtitle" binding:"required"`
+		Subtitle       string          `json:"subtitle"`
 		SubtitleEn     string          `json:"subtitle_en"`
+		Type           string		   `json:"type" binding:"required`
+		Cover		   string          `json:"cover" binding:"required"`
 		StartDate      string          `json:"start_date" binding:"required"`
 		EndDate        string          `json:"end_date"`
 		Draft          bool            `json:"draft"`
@@ -237,6 +239,8 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 		TitleEn:        req.TitleEn,
 		Subtitle:       req.Subtitle,
 		SubtitleEn:     req.SubtitleEn,
+		Type:			req.Type,
+		Cover:     	    req.Cover,
 		StartDate:      req.StartDate,
 		EndDate:        req.EndDate,
 		Draft:          req.Draft,
@@ -270,6 +274,8 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 		TitleEn        string          `json:"title_en"`
 		Subtitle       string          `json:"subtitle"`
 		SubtitleEn     string          `json:"subtitle_en"`
+		Type 		   string          `json:"type"`
+		Cover		   string          `json:"cover"`
 		StartDate      string          `json:"start_date"`
 		EndDate        string          `json:"end_date"`
 		Draft          bool            `json:"draft"`
@@ -304,6 +310,8 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 		TitleEn:        req.TitleEn,
 		Subtitle:       req.Subtitle,
 		SubtitleEn:     req.SubtitleEn,
+		Type:			req.Type,
+		Cover: 			req.Cover,
 		StartDate:      req.StartDate,
 		EndDate:        req.EndDate,
 		Draft:          req.Draft,

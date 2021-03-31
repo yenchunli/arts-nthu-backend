@@ -39,6 +39,8 @@ func (db *DB) ListExhibitions(arg store.ListExhibitionsParams) ([]store.Exhibiti
 			&exhibition.TitleEn,
 			&exhibition.Subtitle,
 			&exhibition.SubtitleEn,
+			&exhibition.Type,
+			&exhibition.Cover,
 			&exhibition.StartDate,
 			&exhibition.EndDate,
 			&exhibition.Draft,
@@ -81,6 +83,8 @@ func (db *DB) GetExhibition(id int32) (exhibition store.Exhibition, err error) {
 		&exhibition.TitleEn,
 		&exhibition.Subtitle,
 		&exhibition.SubtitleEn,
+		&exhibition.Type,
+		&exhibition.Cover,
 		&exhibition.StartDate,
 		&exhibition.EndDate,
 		&exhibition.Draft,
@@ -108,6 +112,8 @@ type CreateExhibitionParams struct {
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
 	SubtitleEn     string    `json:"subtitle_en"`
+	Type		   string    `json:"type"`
+	Cover		   string    `json:"cover"`
 	StartDate      string    `json:"start_date"`
 	EndDate        string    `json:"end_date"`
 	Draft          bool      `json:"draft"`
@@ -133,6 +139,8 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		title_en,
 		subtitle,
 		subtitle_en,
+		type,
+		cover,
 		start_date,
 		end_date,
 		draft,
@@ -151,9 +159,11 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		create_at,
 		update_at
 	) VALUES (
-		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
+		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
 	) RETURNING id,title,title_en,subtitle,
 	subtitle_en,
+	type,
+	cover,
 	start_date,
 	end_date,
 	draft,
@@ -178,6 +188,8 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		arg.TitleEn,
 		arg.Subtitle,
 		arg.SubtitleEn,
+		arg.Type,
+		arg.Cover,
 		arg.StartDate,
 		arg.EndDate,
 		arg.Draft,
@@ -205,6 +217,8 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 		&e.TitleEn,
 		&e.Subtitle,
 		&e.SubtitleEn,
+		&e.Type,
+		&e.Cover,
 		&e.StartDate,
 		&e.EndDate,
 		&e.Draft,
@@ -227,30 +241,33 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 }
 
 func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition, error) {
+	
 	const command = `
 	UPDATE exhibitions
 	SET title=$2,
 	title_en=$3,
 	subtitle=$4,
 	subtitle_en=$5,
-	start_date=$6,
-	end_date=$7,
-	draft=$8,
-	host=$9,
-	host_en=$10,
-	performer=$11,
-	location=$12,
-	location_en=$13,
-	daily_start_time=$14,
-	daily_end_time=$15,
-	category=$16,
-	description=$17,
-	description_en=$18,
-	content=$19,
-	content_en=$20,
-	updated_at=$21
+	type=$6
+	cover=$7,
+	start_date=$8,
+	end_date=$9,
+	draft=$10,
+	host=$11,
+	host_en=$12,
+	performer=$13,
+	location=$14,
+	location_en=$15,
+	daily_start_time=$16,
+	daily_end_time=$17,
+	category=$18,
+	description=$19,
+	description_en=$20,
+	content=$21,
+	content_en=$22,
+	update_at=$23
 	WHERE id = $1
-	RETURNING id,title,title_en,subtitle,subtitle_en,start_date,end_date,draft,host,host_en,performer,location,location_en,daily_start_time,daily_end_time,category,description,description_en,content,content_en,create_at,updated_at
+	RETURNING id,title,title_en,subtitle,subtitle_en,type,cover,start_date,end_date,draft,host,host_en,performer,location,location_en,daily_start_time,daily_end_time,category,description,description_en,content,content_en,create_at,update_at
 	`
 	
 	currentTime := time.Now().Unix()
@@ -260,6 +277,8 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 		arg.TitleEn,
 		arg.Subtitle,
 		arg.SubtitleEn,
+		arg.Type,
+		arg.Cover,
 		arg.StartDate,
 		arg.EndDate,
 		arg.Draft,
@@ -286,6 +305,8 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 		&e.TitleEn,
 		&e.Subtitle,
 		&e.SubtitleEn,
+		&e.Type,
+		&e.Cover,
 		&e.StartDate,
 		&e.EndDate,
 		&e.Draft,

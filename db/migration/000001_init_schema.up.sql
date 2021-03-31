@@ -4,6 +4,8 @@ CREATE TABLE "exhibitions" (
     "title_en" varchar(60) DEFAULT '', 
     "subtitle" varchar(30) DEFAULT '',
     "subtitle_en" varchar(60) DEFAULT '',
+    "type"  varchar(20) DEFAULT '',
+    "cover" varchar(100) DEFAULT '',
     "start_date" varchar(10) NOT NULL,
     "end_date" varchar(10) DEFAULT '',
     "draft" boolean NOT NULL DEFAULT true,

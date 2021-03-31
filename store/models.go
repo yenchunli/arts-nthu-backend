@@ -34,6 +34,8 @@ type Exhibition struct {
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
 	SubtitleEn     string    `json:"subtitle_en"`
+	Type 		   string    `json:"type"`
+	Cover 		   string    `json:"cover"`
 	StartDate      string    `json:"start_date"`
 	EndDate        string    `json:"end_date"`
 	Draft          bool      `json:"draft"`
@@ -58,6 +60,8 @@ type CreateExhibitionParams struct {
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
 	SubtitleEn     string    `json:"subtitle_en"`
+	Type		   string    `json:"type"`
+	Cover 		   string    `json:"cover"`
 	StartDate      string    `json:"start_date"`
 	EndDate        string    `json:"end_date"`
 	Draft          bool      `json:"draft"`
@@ -86,6 +90,8 @@ type EditExhibitionParams struct {
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
 	SubtitleEn     string    `json:"subtitle_en"`
+	Type 		   string    `json:"type"`
+	Cover 		   string    `json:"cover"`
 	StartDate      string    `json:"start_date"`
 	EndDate        string    `json:"end_date"`
 	Draft          bool      `json:"draft"`
