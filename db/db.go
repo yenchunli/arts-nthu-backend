@@ -2,10 +2,10 @@ package db
 
 import (
 	"database/sql"
-	store "github.com/yenchunli/go-nthu-artscenter-server/store"
-	_ "github.com/lib/pq"
-	"time"
 	"fmt"
+	_ "github.com/lib/pq"
+	store "github.com/yenchunli/go-nthu-artscenter-server/store"
+	"time"
 )
 
 type DB struct {
@@ -17,7 +17,7 @@ func NewDB(conn *sql.DB) store.Store {
 }
 
 func (db *DB) ListExhibitions(arg store.ListExhibitionsParams) ([]store.Exhibition, error) {
-	
+
 	var command string
 	var err error
 	var rows *sql.Rows
@@ -40,14 +40,13 @@ func (db *DB) ListExhibitions(arg store.ListExhibitionsParams) ([]store.Exhibiti
 		`
 		rows, err = db.conn.Query(command, arg.Type, arg.Limit, arg.Offset)
 	}
-	
 
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	items := []store.Exhibition{}
-	
+
 	for rows.Next() {
 		var exhibition store.Exhibition
 		if err := rows.Scan(
@@ -121,31 +120,6 @@ func (db *DB) GetExhibition(id int32) (exhibition store.Exhibition, err error) {
 		&exhibition.UpdateAt,
 	)
 	return exhibition, err
-}
-
-type CreateExhibitionParams struct {
-	ID             int64     `json:"id"`
-	Title          string    `json:"title"`
-	TitleEn        string    `json:"title_en"`
-	Subtitle       string    `json:"subtitle"`
-	SubtitleEn     string    `json:"subtitle_en"`
-	Type		   string    `json:"type"`
-	Cover		   string    `json:"cover"`
-	StartDate      string    `json:"start_date"`
-	EndDate        string    `json:"end_date"`
-	Draft          bool      `json:"draft"`
-	Host           string    `json:"host"`
-	HostEn         string    `json:"host_en"`
-	Performer      store.Performer `json:"performer"`
-	Location       string    `json:"location"`
-	LocationEn     string    `json:"location_en"`
-	DailyStartTime string    `json:"daily_start_time"`
-	DailyEndTime   string    `json:"daily_end_time"`
-	Category       string    `json:"category"`
-	Description    string    `json:"description"`
-	DescriptionEn  string    `json:"description_en"`
-	Content        string    `json:"content"`
-	ContentEn      string    `json:"content_en"`
 }
 
 func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibition, error) {
@@ -258,7 +232,7 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 }
 
 func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition, error) {
-	
+
 	const command = `
 	UPDATE exhibitions
 	SET title=$2,
@@ -286,7 +260,7 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 	WHERE id = $1
 	RETURNING id,title,title_en,subtitle,subtitle_en,type,cover,start_date,end_date,draft,host,host_en,performer,location,location_en,daily_start_time,daily_end_time,category,description,description_en,content,content_en,create_at,update_at
 	`
-	
+
 	currentTime := time.Now().Unix()
 	row := db.conn.QueryRow(command,
 		arg.ID,
@@ -313,7 +287,7 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 		arg.ContentEn,
 		currentTime,
 	)
-	
+
 	var e store.Exhibition
 
 	err := row.Scan(
@@ -353,7 +327,7 @@ func (db *DB) DeleteExhibition(id int32) error {
 	`
 
 	_, err := db.conn.Exec(command, id)
-	
+
 	return err
 }
 
@@ -407,4 +381,221 @@ func (db *DB) GetUser(username string) (store.User, error) {
 		&user.CreateAt,
 	)
 	return user, err
+}
+
+func (db *DB) ListNews(arg store.ListNewsParams) ([]store.News, error) {
+	var command string
+	var err error
+	var rows *sql.Rows
+
+	if arg.Type == "" {
+		command = `
+		SELECT * FROM news 
+		ORDER by start_date
+		LIMIT $1
+		OFFSET $2
+		`
+		rows, err = db.conn.Query(command, arg.Limit, arg.Offset)
+	} else {
+		command = `
+		SELECT * FROM news
+		WHERE type=$1
+		ORDER by start_date
+		LIMIT $2
+		OFFSET $3
+		`
+		rows, err = db.conn.Query(command, arg.Type, arg.Limit, arg.Offset)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []store.News{}
+
+	for rows.Next() {
+		var n store.News
+		if err := rows.Scan(
+			&n.ID,
+			&n.Username,
+			&n.Author,
+			&n.Title,
+			&n.TitleEn,
+			&n.StartDate,
+			&n.Type,
+			&n.Draft,
+			&n.Content,
+			&n.ContentEn,
+			&n.CreateAt,
+			&n.UpdateAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, n)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, err
+
+}
+func (db *DB) GetNews(id int32) (store.News, error) {
+
+	const command = `
+	SELECT * FROM news WHERE id=$1`
+
+	var n store.News
+	var err error
+	err = db.conn.QueryRow(command, id).Scan(
+		&n.ID,
+		&n.Username,
+		&n.Author,
+		&n.Title,
+		&n.TitleEn,
+		&n.StartDate,
+		&n.Type,
+		&n.Draft,
+		&n.Content,
+		&n.ContentEn,
+		&n.CreateAt,
+		&n.UpdateAt,
+	)
+	return n, err
+}
+func (db *DB) CreateNews(arg store.CreateNewsParams) (store.News, error) {
+	const command = `
+	INSERT INTO news (
+		username,
+		author,
+		title,
+		title_en,
+		start_date,
+		type,
+		draft,
+		content,
+		content_en,
+		create_at,
+		update_at
+	) VALUES (
+		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+	) RETURNING id,
+	username,
+	author,
+	title,
+	title_en,
+	start_date,
+	type,
+	draft,
+	content,
+	content_en,
+	create_at,
+	update_at
+	`
+	currentTime := time.Now().Unix()
+	row := db.conn.QueryRow(command,
+		arg.Username,
+		arg.Author,
+		arg.Title,
+		arg.TitleEn,
+		arg.StartDate,
+		arg.Type,
+		arg.Draft,
+		arg.Content,
+		arg.ContentEn,
+		currentTime,
+		currentTime,
+	)
+	
+	var n store.News
+
+	err := row.Scan(
+		&n.ID,
+		&n.Username,
+		&n.Author,
+		&n.Title,
+		&n.TitleEn,
+		&n.StartDate,
+		&n.Type,
+		&n.Draft,
+		&n.Content,
+		&n.ContentEn,
+		&n.CreateAt,
+		&n.UpdateAt,
+	)
+	return n, err
+}
+func (db *DB) EditNews(arg store.EditNewsParams) (store.News, error) {
+	const command = `
+	UPDATE news
+	SET username=$2,
+	author=$3,
+	title=$4,
+	title_en=$5,
+	start_date=$6,
+	type=$7,
+	draft=$8,
+	content=$9,
+	content_en=$10,
+	update_at=$11
+	WHERE id = $1
+	RETURNING id,
+	username,
+	author,
+	title,
+	title_en,
+	start_date,
+	type,
+	draft,
+	content,
+	content_en,
+	create_at,
+	update_at
+	`
+
+	currentTime := time.Now().Unix()
+	row := db.conn.QueryRow(command,
+		arg.ID,
+		arg.Username,
+		arg.Author,
+		arg.Title,
+		arg.TitleEn,
+		arg.StartDate,
+		arg.Type,
+		arg.Draft,
+		arg.Content,
+		arg.ContentEn,
+		currentTime,
+	)
+
+	var n store.News
+
+	err := row.Scan(
+		&n.ID,
+		&n.Username,
+		&n.Author,
+		&n.Title,
+		&n.TitleEn,
+		&n.StartDate,
+		&n.Type,
+		&n.Draft,
+		&n.Content,
+		&n.ContentEn,
+		&n.CreateAt,
+		&n.UpdateAt,
+	)
+	return n, err
+}
+func (db *DB) DeleteNews(id int32) error {
+	const command = `
+	DELETE FROM news
+	WHERE id = $1
+	`
+
+	_, err := db.conn.Exec(command, id)
+
+	return err
 }

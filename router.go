@@ -4,24 +4,30 @@ import (
 	"database/sql"
 	//"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/yenchunli/go-nthu-artscenter-server/middleware"
 	store "github.com/yenchunli/go-nthu-artscenter-server/store"
 	"github.com/yenchunli/go-nthu-artscenter-server/token"
 	"github.com/yenchunli/go-nthu-artscenter-server/util"
-	"github.com/yenchunli/go-nthu-artscenter-server/middleware"
 	"net/http"
 	"strconv"
 )
 
 type ExhibitionSvc struct {
-	store store.Store
+	store      store.Store
 	tokenMaker token.Maker
-	config Config
+	config     Config
 }
 
 type UserSvc struct {
-	store store.Store
+	store      store.Store
 	tokenMaker token.Maker
-	config Config
+	config     Config
+}
+
+type NewsSvc struct {
+	store      store.Store
+	tokenMaker token.Maker
+	config     Config
 }
 
 func NewRouter(config Config, store store.Store, tokenMaker token.Maker) *gin.Engine {
@@ -32,11 +38,15 @@ func NewRouter(config Config, store store.Store, tokenMaker token.Maker) *gin.En
 
 	exhibitionSvc := NewExhibitionSvc(store, tokenMaker, config)
 	userSvc := NewUserSvc(store, tokenMaker, config)
+	newsSvc := NewNewsSvc(store, tokenMaker, config)
 
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.GET("/exhibitions", exhibitionSvc.List)
 		apiv1.GET("/exhibitions/:id", exhibitionSvc.Get)
+
+		apiv1.GET("/news", newsSvc.List)
+		apiv1.GET("/news/:id", newsSvc.Get)
 
 		apiv1.POST("/users", userSvc.Create)
 		apiv1.POST("/users/login", userSvc.Login)
@@ -47,14 +57,25 @@ func NewRouter(config Config, store store.Store, tokenMaker token.Maker) *gin.En
 		apiv1_auth.POST("/exhibitions", exhibitionSvc.Create)
 		apiv1_auth.PUT("/exhibitions/:id", exhibitionSvc.Edit)
 		apiv1_auth.DELETE("/exhibitions/:id", exhibitionSvc.Delete)
-	}
 
+		apiv1_auth.POST("/news", newsSvc.Create)
+		apiv1_auth.PUT("/news/:id", newsSvc.Edit)
+		apiv1_auth.DELETE("/news/:id", newsSvc.Delete)
+	}
 
 	return r
 }
 
 func NewUserSvc(store store.Store, tokenMaker token.Maker, config Config) *UserSvc {
-	return &UserSvc{store: store, tokenMaker: tokenMaker, config: config,}
+	return &UserSvc{store: store, tokenMaker: tokenMaker, config: config}
+}
+
+func NewExhibitionSvc(store store.Store, tokenMaker token.Maker, config Config) *ExhibitionSvc {
+	return &ExhibitionSvc{store: store, tokenMaker: tokenMaker, config: config}
+}
+
+func NewNewsSvc(store store.Store, tokenMaker token.Maker, config Config) *NewsSvc {
+	return &NewsSvc{store: store, tokenMaker: tokenMaker, config: config}
 }
 
 func (svc *UserSvc) Create(ctx *gin.Context) {
@@ -97,6 +118,7 @@ func (svc *UserSvc) Create(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
+	return
 }
 
 func (svc *UserSvc) Login(ctx *gin.Context) {
@@ -145,11 +167,10 @@ func (svc *UserSvc) Login(ctx *gin.Context) {
 		Username:    user.Username,
 	}
 	ctx.JSON(http.StatusOK, res)
+	return
 }
 
-func NewExhibitionSvc(store store.Store, tokenMaker token.Maker, config Config) *ExhibitionSvc {
-	return &ExhibitionSvc{store: store, tokenMaker: tokenMaker, config: config,}
-}
+
 
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
@@ -157,8 +178,8 @@ func errorResponse(err error) gin.H {
 
 func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 	type request struct {
-		Start int32 `form:"start" binding:"required,min=1`
-		Size  int32 `form:"size" binding:"required,min=6, max=12`
+		Start int32  `form:"start" binding:"required,min=1`
+		Size  int32  `form:"size" binding:"required,min=6, max=12`
 		Type  string `form:"type"`
 	}
 	var req request
@@ -182,7 +203,7 @@ func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 	arg := store.ListExhibitionsParams{
 		Limit:  req.Size,
 		Offset: (req.Start - 1) * req.Size,
-		Type: req.Type,
+		Type:   req.Type,
 	}
 
 	exhibitions, err := svc.store.ListExhibitions(arg)
@@ -193,6 +214,7 @@ func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, exhibitions)
+	return
 }
 
 func (svc *ExhibitionSvc) Get(ctx *gin.Context) {
@@ -216,6 +238,7 @@ func (svc *ExhibitionSvc) Get(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, exhibition)
+	return
 }
 
 func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
@@ -224,8 +247,8 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 		TitleEn        string          `json:"title_en"`
 		Subtitle       string          `json:"subtitle"`
 		SubtitleEn     string          `json:"subtitle_en"`
-		Type           string		   `json:"type" binding:"required"`
-		Cover		   string          `json:"cover" binding:"required"`
+		Type           string          `json:"type" binding:"required"`
+		Cover          string          `json:"cover" binding:"required"`
 		StartDate      string          `json:"start_date" binding:"required"`
 		EndDate        string          `json:"end_date"`
 		Draft          bool            `json:"draft"`
@@ -253,8 +276,8 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 		TitleEn:        req.TitleEn,
 		Subtitle:       req.Subtitle,
 		SubtitleEn:     req.SubtitleEn,
-		Type:			req.Type,
-		Cover:     	    req.Cover,
+		Type:           req.Type,
+		Cover:          req.Cover,
 		StartDate:      req.StartDate,
 		EndDate:        req.EndDate,
 		Draft:          req.Draft,
@@ -280,6 +303,7 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, exhibition)
+	return
 }
 
 func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
@@ -288,8 +312,8 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 		TitleEn        string          `json:"title_en"`
 		Subtitle       string          `json:"subtitle"`
 		SubtitleEn     string          `json:"subtitle_en"`
-		Type 		   string          `json:"type"`
-		Cover		   string          `json:"cover"`
+		Type           string          `json:"type"`
+		Cover          string          `json:"cover"`
 		StartDate      string          `json:"start_date"`
 		EndDate        string          `json:"end_date"`
 		Draft          bool            `json:"draft"`
@@ -311,6 +335,7 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -324,8 +349,8 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 		TitleEn:        req.TitleEn,
 		Subtitle:       req.Subtitle,
 		SubtitleEn:     req.SubtitleEn,
-		Type:			req.Type,
-		Cover: 			req.Cover,
+		Type:           req.Type,
+		Cover:          req.Cover,
 		StartDate:      req.StartDate,
 		EndDate:        req.EndDate,
 		Draft:          req.Draft,
@@ -351,6 +376,7 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, exhibition)
+	return
 }
 
 func (svc *ExhibitionSvc) Delete(ctx *gin.Context) {
@@ -365,4 +391,176 @@ func (svc *ExhibitionSvc) Delete(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{})
+}
+
+func (svc *NewsSvc) List(ctx *gin.Context) {
+	type request struct {
+		Start int32  `form:"start" binding:"required,min=1`
+		Size  int32  `form:"size" binding:"required,min=6, max=12`
+		Type  string `form:"type"`
+	}
+	var req request
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	switch req.Type {
+	case "":
+	case "exhibition":
+	case "information":
+	default:
+		ctx.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	arg := store.ListNewsParams{
+		Limit:  req.Size,
+		Offset: (req.Start - 1) * req.Size,
+		Type:   req.Type,
+	}
+
+	news, err := svc.store.ListNews(arg)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, news)
+	return
+}
+
+func (svc *NewsSvc) Get(ctx *gin.Context) {
+	type request struct {
+		ID int32 `uri:"id" binding:"required,min=1"`
+	}
+	var req request
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	news, err := svc.store.GetNews(req.ID)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, news)
+	return
+}
+
+func (svc *NewsSvc) Create(ctx *gin.Context) {
+	type request struct {
+		Author    string `json:"author"  binding:"required"`
+		Title     string `json:"title"  binding:"required"`
+		TitleEn   string `json:"title_en"`
+		StartDate string `json:"start_date"  binding:"required"`
+		Type 	  string `json:"type"  binding:"required"`
+		Draft     bool 	 `json:"draft"`
+		Content   string `json:"content"  binding:"required"`
+		ContentEn string `json:"content_en"`
+	}
+	
+	var req request
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	payload, _ := ctx.MustGet("authorization_payload").(*token.Payload)
+
+	arg := store.CreateNewsParams{
+		Username : payload.Username,
+		Author   : req.Author   ,
+		Title    : req.Title    ,
+		TitleEn  : req.TitleEn  ,
+		StartDate: req.StartDate,
+		Type 	 : req.Type 	 ,
+		Draft    : req.Draft    ,
+		Content  : req.Content  ,
+		ContentEn: req.ContentEn,
+	}
+
+	news, err := svc.store.CreateNews(arg)
+	if err != nil {
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, news)
+	return
+}
+
+func (svc *NewsSvc) Edit(ctx *gin.Context) {
+	type request struct {
+		Author    string `json:"author"  binding:"required"`
+		Title     string `json:"title"  binding:"required"`
+		TitleEn   string `json:"title_en"`
+		StartDate string `json:"start_date"  binding:"required"`
+		Type 	  string `json:"type"  binding:"required"`
+		Draft     bool 	 `json:"draft"`
+		Content   string `json:"content"  binding:"required"`
+		ContentEn string `json:"content_en"`
+	}
+
+	var req request
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+
+	payload, _ := ctx.MustGet("authorization_payload").(*token.Payload)
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := store.EditNewsParams{
+		ID: int32(id),
+		Username : payload.Username,
+		Author   : req.Author   ,
+		Title    : req.Title    ,
+		TitleEn  : req.TitleEn  ,
+		StartDate: req.StartDate,
+		Type 	 : req.Type 	 ,
+		Draft    : req.Draft    ,
+		Content  : req.Content  ,
+		ContentEn: req.ContentEn,
+	}
+
+	news, err := svc.store.EditNews(arg)
+
+	if err != nil {
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, news)
+	return
+}
+
+func (svc *NewsSvc) Delete(ctx *gin.Context) {
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if svc.store.DeleteNews(int32(id)); err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{})
+	return
 }

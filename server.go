@@ -1,18 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/yenchunli/go-nthu-artscenter-server/store"
 	"github.com/yenchunli/go-nthu-artscenter-server/token"
 	"net/http"
 	"time"
-	"fmt"
 )
 
 type Server struct {
-	config Config
-	store  store.Store // Database Interface
-	router *gin.Engine
+	config     Config
+	store      store.Store // Database Interface
+	router     *gin.Engine
 	tokenMaker token.Maker
 }
 
@@ -24,12 +24,12 @@ func NewServer(config Config, store store.Store) (*Server, error) {
 	}
 
 	return &Server{
-		config: config,
-		store:  store,
+		config:     config,
+		store:      store,
 		tokenMaker: tokenMaker,
-		router: router,
+		router:     router,
 	}, nil
-	
+
 }
 
 func (server *Server) Run() {
