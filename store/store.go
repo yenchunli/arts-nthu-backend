@@ -9,4 +9,10 @@ type Store interface {
 
 	CreateUser(arg CreateUserParams) (User, error)
 	GetUser(username string) (User, error)
+
+	ListNews(arg ListNewsParams) ([]News, error)
+	GetNews(id int32) (News, error)
+	CreateNews(arg CreateNewsParams) (News, error)
+	EditNews(arg EditNewsParams) (News, error)
+	DeleteNews(id int32) error
 }

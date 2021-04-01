@@ -17,13 +17,30 @@ func NewDB(conn *sql.DB) store.Store {
 }
 
 func (db *DB) ListExhibitions(arg store.ListExhibitionsParams) ([]store.Exhibition, error) {
-	const command = `
-	SELECT * FROM exhibitions 
-	ORDER by start_date
-	LIMIT $1
-	OFFSET $2
-	`
-	rows, err := db.conn.Query(command, arg.Limit, arg.Offset)
+	
+	var command string
+	var err error
+	var rows *sql.Rows
+
+	if arg.Type == "" {
+		command = `
+		SELECT * FROM exhibitions 
+		ORDER by start_date
+		LIMIT $1
+		OFFSET $2
+		`
+		rows, err = db.conn.Query(command, arg.Limit, arg.Offset)
+	} else {
+		command = `
+		SELECT * FROM exhibitions
+		WHERE type=$1
+		ORDER by start_date
+		LIMIT $2
+		OFFSET $3
+		`
+		rows, err = db.conn.Query(command, arg.Type, arg.Limit, arg.Offset)
+	}
+	
 
 	if err != nil {
 		return nil, err

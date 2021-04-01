@@ -82,6 +82,7 @@ type CreateExhibitionParams struct {
 type ListExhibitionsParams struct {
 	Limit int32 `json:"limit"`
 	Offset int32 `json:"offset"`
+	Type   string `json:"type"`
 }
 
 type EditExhibitionParams struct {

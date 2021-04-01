@@ -159,6 +159,7 @@ func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 	type request struct {
 		Start int32 `form:"start" binding:"required,min=1`
 		Size  int32 `form:"size" binding:"required,min=6, max=12`
+		Type  string `form:"type"`
 	}
 	var req request
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -166,9 +167,22 @@ func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 		return
 	}
 
+	switch req.Type {
+	case "":
+	case "visual_art":
+	case "public_art":
+	case "film_art":
+	case "performing_art":
+	case "ai_music":
+	default:
+		ctx.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
 	arg := store.ListExhibitionsParams{
 		Limit:  req.Size,
 		Offset: (req.Start - 1) * req.Size,
+		Type: req.Type,
 	}
 
 	exhibitions, err := svc.store.ListExhibitions(arg)
@@ -210,7 +224,7 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 		TitleEn        string          `json:"title_en"`
 		Subtitle       string          `json:"subtitle"`
 		SubtitleEn     string          `json:"subtitle_en"`
-		Type           string		   `json:"type" binding:"required`
+		Type           string		   `json:"type" binding:"required"`
 		Cover		   string          `json:"cover" binding:"required"`
 		StartDate      string          `json:"start_date" binding:"required"`
 		EndDate        string          `json:"end_date"`
