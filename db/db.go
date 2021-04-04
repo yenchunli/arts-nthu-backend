@@ -89,7 +89,7 @@ func (db *DB) ListExhibitions(arg store.ListExhibitionsParams) ([]store.Exhibiti
 	return items, err
 }
 
-func (db *DB) GetExhibition(id int32) (exhibition store.Exhibition, err error) {
+func (db *DB) GetExhibition(id int) (exhibition store.Exhibition, err error) {
 	const command = `
 	SELECT * FROM exhibitions WHERE id=$1`
 
@@ -319,7 +319,7 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 	return e, err
 }
 
-func (db *DB) DeleteExhibition(id int32) error {
+func (db *DB) DeleteExhibition(id int) error {
 
 	const command = `
 	DELETE FROM exhibitions
@@ -331,6 +331,20 @@ func (db *DB) DeleteExhibition(id int32) error {
 	return err
 }
 
+func (db *DB) GetExhibitionsMaxSize() (int, error) {
+
+	const command = `SELECT count(id) FROM exhibitions`
+
+	var maxSize int
+	maxSize = 0
+	err := db.conn.QueryRow(command).Scan(&maxSize)
+
+	if err != nil {
+		return maxSize, err
+	}
+	return maxSize, nil
+
+}
 func (db *DB) CreateUser(arg store.CreateUserParams) (store.User, error) {
 	const command = `
 	INSERT INTO users (
@@ -391,7 +405,7 @@ func (db *DB) ListNews(arg store.ListNewsParams) ([]store.News, error) {
 	if arg.Type == "" {
 		command = `
 		SELECT * FROM news 
-		ORDER by start_date
+		ORDER by start_date DESC
 		LIMIT $1
 		OFFSET $2
 		`
@@ -400,7 +414,7 @@ func (db *DB) ListNews(arg store.ListNewsParams) ([]store.News, error) {
 		command = `
 		SELECT * FROM news
 		WHERE type=$1
-		ORDER by start_date
+		ORDER by start_date DESC
 		LIMIT $2
 		OFFSET $3
 		`
@@ -443,7 +457,7 @@ func (db *DB) ListNews(arg store.ListNewsParams) ([]store.News, error) {
 	return items, err
 
 }
-func (db *DB) GetNews(id int32) (store.News, error) {
+func (db *DB) GetNews(id int) (store.News, error) {
 
 	const command = `
 	SELECT * FROM news WHERE id=$1`
@@ -589,7 +603,7 @@ func (db *DB) EditNews(arg store.EditNewsParams) (store.News, error) {
 	)
 	return n, err
 }
-func (db *DB) DeleteNews(id int32) error {
+func (db *DB) DeleteNews(id int) error {
 	const command = `
 	DELETE FROM news
 	WHERE id = $1

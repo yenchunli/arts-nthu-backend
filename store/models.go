@@ -30,7 +30,7 @@ func (p *Performer) Scan(value interface{}) error {
 }
 
 type Exhibition struct {
-	ID             int32     `json:"id"`
+	ID             int     `json:"id"`
 	Title          string    `json:"title"`
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
@@ -81,13 +81,13 @@ type CreateExhibitionParams struct {
 }
 
 type ListExhibitionsParams struct {
-	Limit  int32  `json:"limit"`
-	Offset int32  `json:"offset"`
+	Limit  int  `json:"limit"`
+	Offset int  `json:"offset"`
 	Type   string `json:"type"`
 }
 
 type EditExhibitionParams struct {
-	ID             int32     `json:"id"`
+	ID             int     `json:"id"`
 	Title          string    `json:"title"`
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
@@ -130,12 +130,12 @@ type CreateUserParams struct {
 
 // News Model
 type News struct {
-	ID        int32  `json:"id"`
+	ID        int  `json:"id"`
 	Username  string `json:"username"`
 	Author    string `json:"author"`
 	Title     string `json:"title"`
 	TitleEn   string `json:"title_en"`
-	StartDate string `json:"start_date`
+	StartDate string `json:"start_date"`
 	Type 	  string `json:"type"`
 	Draft     bool `json:"draft"`
 	Content   string `json:"content"`
@@ -145,8 +145,8 @@ type News struct {
 }
 
 type ListNewsParams struct {
-	Limit  int32  `json:"limit"`
-	Offset int32  `json:"offset"`
+	Limit  int  `json:"limit"`
+	Offset int  `json:"offset"`
 	Type   string `json:"type"`
 }
 
@@ -155,7 +155,7 @@ type CreateNewsParams struct {
 	Author    string `json:"author"`
 	Title     string `json:"title"`
 	TitleEn   string `json:"title_en"`
-	StartDate string `json:"start_date`
+	StartDate string `json:"start_date"`
 	Type 	  string `json:"type"`
 	Draft     bool `json:"draft"`
 	Content   string `json:"content"`
@@ -163,14 +163,14 @@ type CreateNewsParams struct {
 }
 
 type EditNewsParams struct {
-	ID        int32  `json:"id"`
+	ID        int  `json:"id"`
 	Username  string `json:"username"`
 	Author    string `json:"author"`
 	Title     string `json:"title"`
 	TitleEn   string `json:"title_en"`
-	StartDate string `json:"start_date`
+	StartDate string `json:"start_date"`
 	Type 	  string `json:"type"`
-	Draft     bool `json:"draft"`
+	Draft     bool 	 `json:"draft"`
 	Content   string `json:"content"`
 	ContentEn string `json:"content_en"`
 }

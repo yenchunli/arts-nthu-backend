@@ -178,11 +178,18 @@ func errorResponse(err error) gin.H {
 
 func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 	type request struct {
-		Start int32  `form:"start" binding:"required,min=1`
-		Size  int32  `form:"size" binding:"required,min=6, max=12`
+		Start int  `form:"start" binding:"required,min=1`
+		Size  int  `form:"size" binding:"required,min=6, max=12`
 		Type  string `form:"type"`
 	}
+	type response struct {
+		Data 	[]store.Exhibition `json:"data"`
+		MaxSize int    			   `json:"max_size"`
+	}
+
 	var req request
+	var res response
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -212,14 +219,21 @@ func (svc *ExhibitionSvc) List(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	ctx.JSON(http.StatusOK, exhibitions)
+	
+	maxSize, err := svc.store.GetExhibitionsMaxSize()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	res.Data = exhibitions
+	res.MaxSize = maxSize
+	ctx.JSON(http.StatusOK, res)
 	return
 }
 
 func (svc *ExhibitionSvc) Get(ctx *gin.Context) {
 	type request struct {
-		ID int32 `uri:"id" binding:"required,min=1"`
+		ID int `uri:"id" binding:"required,min=1"`
 	}
 	var req request
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -332,7 +346,7 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 	}
 
 	var req request
-	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -344,7 +358,7 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 	}
 
 	arg := store.EditExhibitionParams{
-		ID:             int32(id),
+		ID:             int(id),
 		Title:          req.Title,
 		TitleEn:        req.TitleEn,
 		Subtitle:       req.Subtitle,
@@ -381,12 +395,12 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 
 func (svc *ExhibitionSvc) Delete(ctx *gin.Context) {
 
-	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
-	if svc.store.DeleteExhibition(int32(id)); err != nil {
+	if svc.store.DeleteExhibition(id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -395,8 +409,8 @@ func (svc *ExhibitionSvc) Delete(ctx *gin.Context) {
 
 func (svc *NewsSvc) List(ctx *gin.Context) {
 	type request struct {
-		Start int32  `form:"start" binding:"required,min=1`
-		Size  int32  `form:"size" binding:"required,min=6, max=12`
+		Start int  `form:"start" binding:"required,min=1`
+		Size  int  `form:"size" binding:"required,min=6, max=12`
 		Type  string `form:"type"`
 	}
 	var req request
@@ -433,7 +447,7 @@ func (svc *NewsSvc) List(ctx *gin.Context) {
 
 func (svc *NewsSvc) Get(ctx *gin.Context) {
 	type request struct {
-		ID int32 `uri:"id" binding:"required,min=1"`
+		ID int `uri:"id" binding:"required,min=1"`
 	}
 	var req request
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -511,7 +525,7 @@ func (svc *NewsSvc) Edit(ctx *gin.Context) {
 	}
 
 	var req request
-	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -526,7 +540,7 @@ func (svc *NewsSvc) Edit(ctx *gin.Context) {
 	}
 
 	arg := store.EditNewsParams{
-		ID: int32(id),
+		ID: id,
 		Username : payload.Username,
 		Author   : req.Author   ,
 		Title    : req.Title    ,
@@ -551,13 +565,13 @@ func (svc *NewsSvc) Edit(ctx *gin.Context) {
 }
 
 func (svc *NewsSvc) Delete(ctx *gin.Context) {
-	id, err := strconv.ParseInt(ctx.Param("id"), 10, 32)
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if svc.store.DeleteNews(int32(id)); err != nil {
+	if svc.store.DeleteNews(id); err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
