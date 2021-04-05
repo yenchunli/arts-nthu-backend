@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/yenchunli/go-nthu-artscenter-server/store"
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
@@ -16,7 +18,7 @@ func performRequest(r http.Handler, method, path string) *httptest.ResponseRecor
 }
 
 func TestRouterMethod(t *testing.T) {
-	store := NewMockStore()
+	store := store.NewMockStore()
 	router := NewRouter(store)
 
 	w := performRequest(router, http.MethodGet, "/api/v1/exhibitions")
