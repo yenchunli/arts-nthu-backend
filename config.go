@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/viper"
 	"time"
+	"os"
 )
 
 type Config struct {
@@ -18,9 +19,16 @@ type Config struct {
 }
 
 func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName("test")
-	viper.SetConfigType("env")
+	if os.Getenv("GIN_MODE") == "debug" {
+		viper.AddConfigPath(path)
+		viper.SetConfigName("test")
+		viper.SetConfigType("env")
+	} else if os.Getenv("GIN_MODE") == "release" {
+		viper.AddConfigPath(path)
+		viper.SetConfigName("prod")
+		viper.SetConfigType("env")
+	}
+	
 
 	viper.AutomaticEnv()
 
