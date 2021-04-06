@@ -15,7 +15,7 @@ func main() {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
-	fmt.Println(psqlInfo)
+	
 	conn, err := sql.Open(config.DBDriver, psqlInfo)
 
 	if err != nil {

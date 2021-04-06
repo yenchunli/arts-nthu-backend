@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/spf13/viper"
 	"time"
-	"os"
 )
 
 type Config struct {
@@ -31,5 +30,6 @@ func LoadConfig(path string) (config Config, err error) {
 	}
 
 	err = viper.Unmarshal(&config)
+
 	return
 }

@@ -19,7 +19,7 @@ services:
     restart: always
     env_file: test.env
     environment:
-      DB_HOST: database
+      GIN_MODE: debug
     networks:
       - default
     ports:
