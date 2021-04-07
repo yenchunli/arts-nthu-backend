@@ -273,7 +273,7 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 		LocationEn     string          `json:"location_en"`
 		DailyStartTime string          `json:"daily_start_time"`
 		DailyEndTime   string          `json:"daily_end_time"`
-		Category       string          `json:"category" binding:"required"`
+		Category       string          `json:"category"`
 		Description    string          `json:"description" binding:"required"`
 		DescriptionEn  string          `json:"description_en"`
 		Content        string          `json:"content" binding:"required"`
