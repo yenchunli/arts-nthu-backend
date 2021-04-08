@@ -11,10 +11,10 @@ type Performer struct {
 }
 
 type PerformerPerson struct {
-	Name     string `json:name`
-	NameEn   string `json:name_en`
-	Title    string `json:title`
-	Title_en string `json:title_en`
+	Name     string `json:"name"`
+	NameEn   string `json:"name_en"`
+	Title    string `json:"title"`
+	Title_en string `json:"title_en"`
 }
 
 func (p Performer) Value() (driver.Value, error) {
@@ -87,7 +87,7 @@ type ListExhibitionsParams struct {
 }
 
 type EditExhibitionParams struct {
-	ID             int     `json:"id"`
+	ID             int     	 `json:"id"`
 	Title          string    `json:"title"`
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
