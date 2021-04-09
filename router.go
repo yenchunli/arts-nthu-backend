@@ -268,7 +268,7 @@ func (svc *ExhibitionSvc) Create(ctx *gin.Context) {
 		Draft          bool            `json:"draft"`
 		Host           string          `json:"host"`
 		HostEn         string          `json:"host_en"`
-		Performer      store.Performer `json:"performer"`
+		Performer      string		   `json:"performer"`
 		Location       string          `json:"location"`
 		LocationEn     string          `json:"location_en"`
 		DailyStartTime string          `json:"daily_start_time"`
@@ -333,7 +333,7 @@ func (svc *ExhibitionSvc) Edit(ctx *gin.Context) {
 		Draft          bool            `json:"draft"`
 		Host           string          `json:"host"`
 		HostEn         string          `json:"host_en"`
-		Performer      store.Performer `json:"performer"`
+		Performer      string		   `json:"performer"`
 		Location       string          `json:"location"`
 		LocationEn     string          `json:"location_en"`
 		DailyStartTime string          `json:"daily_start_time"`

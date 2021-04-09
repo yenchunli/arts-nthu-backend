@@ -11,7 +11,7 @@ CREATE TABLE "exhibitions" (
     "draft" boolean NOT NULL DEFAULT true,
     "host" varchar(30) NOT NULL,
     "host_en" varchar(60) DEFAULT '',
-    "performer" json DEFAULT '{}',
+    "performer" varchar(100) DEFAULT '',
     "location" varchar(30) DEFAULT '',
     "location_en" varchar(60) DEFAULT '',
     "daily_start_time" varchar(5) DEFAULT '',

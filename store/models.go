@@ -1,34 +1,5 @@
 package store
 
-import (
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
-)
-
-type Performer struct {
-	Persons []PerformerPerson `json:"persons"`
-}
-
-type PerformerPerson struct {
-	Name     string `json:name`
-	NameEn   string `json:name_en`
-	Title    string `json:title`
-	Title_en string `json:title_en`
-}
-
-func (p Performer) Value() (driver.Value, error) {
-	return json.Marshal(p)
-}
-
-func (p *Performer) Scan(value interface{}) error {
-	b, ok := value.([]byte)
-	if !ok {
-		return errors.New("type assertion to []byte failed")
-	}
-	return json.Unmarshal(b, &p)
-}
-
 type Exhibition struct {
 	ID             int     `json:"id"`
 	Title          string    `json:"title"`
@@ -42,7 +13,7 @@ type Exhibition struct {
 	Draft          bool      `json:"draft"`
 	Host           string    `json:"host"`
 	HostEn         string    `json:"host_en"`
-	Performer      Performer `json:"performer"`
+	Performer      string	 `json:"performer"`
 	Location       string    `json:"location"`
 	LocationEn     string    `json:"location_en"`
 	DailyStartTime string    `json:"daily_start_time"`
@@ -68,7 +39,7 @@ type CreateExhibitionParams struct {
 	Draft          bool      `json:"draft"`
 	Host           string    `json:"host"`
 	HostEn         string    `json:"host_en"`
-	Performer      Performer `json:"performer"`
+	Performer      string	 `json:"performer"`
 	Location       string    `json:"location"`
 	LocationEn     string    `json:"location_en"`
 	DailyStartTime string    `json:"daily_start_time"`
@@ -99,7 +70,7 @@ type EditExhibitionParams struct {
 	Draft          bool      `json:"draft"`
 	Host           string    `json:"host"`
 	HostEn         string    `json:"host_en"`
-	Performer      Performer `json:"performer"`
+	Performer      string	 `json:"performer"`
 	Location       string    `json:"location"`
 	LocationEn     string    `json:"location_en"`
 	DailyStartTime string    `json:"daily_start_time"`
