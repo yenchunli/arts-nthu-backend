@@ -1,22 +1,23 @@
-package main
+package server
 
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/yenchunli/go-nthu-artscenter-server/store"
-	"github.com/yenchunli/go-nthu-artscenter-server/token"
+	"github.com/yenchunli/arts-nthu-backend/store"
+	"github.com/yenchunli/arts-nthu-backend/pkg/token"
+	"github.com/yenchunli/arts-nthu-backend/util"
 	"net/http"
 	"time"
 )
 
 type Server struct {
-	config     Config
+	config     util.Config
 	store      store.Store // Database Interface
 	router     *gin.Engine
 	tokenMaker token.Maker
 }
 
-func NewServer(config Config, store store.Store) (*Server, error) {
+func NewServer(config util.Config, store store.Store) (*Server, error) {
 	tokenMaker, err := token.NewJWTMaker(config.JWTTokenKey)
 	router := NewRouter(config, store, tokenMaker)
 

@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
 	"github.com/gin-gonic/gin"
-	"github.com/yenchunli/go-nthu-artscenter-server/token"
+	"github.com/yenchunli/arts-nthu-backend/pkg/token"
 )
 
 const (

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	store "github.com/yenchunli/go-nthu-artscenter-server/store"
+	store "github.com/yenchunli/arts-nthu-backend/store"
 	"time"
 )
 

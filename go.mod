@@ -1,4 +1,4 @@
-module github.com/yenchunli/go-nthu-artscenter-server
+module github.com/yenchunli/arts-nthu-backend
 
 go 1.15
 

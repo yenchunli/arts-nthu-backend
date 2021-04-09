@@ -3,12 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	db "github.com/yenchunli/go-nthu-artscenter-server/db"
+	db "github.com/yenchunli/arts-nthu-backend/db"
+	"github.com/yenchunli/arts-nthu-backend/util"
+	"github.com/yenchunli/arts-nthu-backend/server"
 	"log"
 )
 
 func main() {
-	config, err := LoadConfig(".")
+	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
@@ -30,7 +32,7 @@ func main() {
 	}
 
 	store := db.NewDB(conn)
-	server, _ := NewServer(config, store)
+	server, _ := server.NewServer(config, store)
 
 	server.Run()
 }

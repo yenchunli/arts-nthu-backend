@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/yenchunli/go-nthu-artscenter-server/store"
+	"github.com/yenchunli/arts-nthu-backend/store"
 )
 
 func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
