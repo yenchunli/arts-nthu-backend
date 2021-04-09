@@ -239,7 +239,7 @@ func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition,
 	title_en=$3,
 	subtitle=$4,
 	subtitle_en=$5,
-	type=$6
+	type=$6,
 	cover=$7,
 	start_date=$8,
 	end_date=$9,

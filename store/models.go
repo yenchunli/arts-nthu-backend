@@ -58,7 +58,7 @@ type ListExhibitionsParams struct {
 }
 
 type EditExhibitionParams struct {
-	ID             int     `json:"id"`
+	ID             int     	 `json:"id"`
 	Title          string    `json:"title"`
 	TitleEn        string    `json:"title_en"`
 	Subtitle       string    `json:"subtitle"`
