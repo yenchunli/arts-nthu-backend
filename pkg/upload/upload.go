@@ -19,15 +19,21 @@ func NewClient(token string, uploadApiUrl string) *Client{
 	return &Client{token: token, uploadApiUrl: uploadApiUrl}
 }
 
-func (client *Client) UploadImage(image io.Reader) (string, error){
+func (client *Client) UploadImage(image []byte) (string, error){
+
+	if image == nil {
+		return "", errors.New("No Image")
+	}
 	var buf = new(bytes.Buffer)
     writer := multipart.NewWriter(buf)
 
-    part, _ := writer.CreateFormFile("image", "dont care about name")
-    io.Copy(part, image)
+    part, _ := writer.CreateFormFile("image", "filename")
+
+	imgReader := bytes.NewReader(image)
+    io.Copy(part, imgReader)
 
     writer.Close()
-    req, _ := http.NewRequest("POST", clinet.uploadApiUrl, buf)
+    req, _ := http.NewRequest("POST", client.uploadApiUrl, buf)
     req.Header.Set("Content-Type", writer.FormDataContentType())
     req.Header.Set("Authorization", "Bearer "+client.token)
 
