@@ -1,6 +1,6 @@
 # NTHU Artscenter Server
 
-## Packages
+## Packages Used
 
 - `gonic/gin`
 - `go-migration`
