@@ -1,6 +1,12 @@
 # NTHU Artscenter Server
 
+## Packages
 
-database order create table go reflex
+- `gonic/gin`
+- `go-migration`
 
-migrate create -ext sql -dir db/migration -seq init_schema
+## Scripts
+
+See Makefiles for more details.
+
+- `migrate create -ext sql -dir db/migration -seq init_schema`: create the schema for migration.
