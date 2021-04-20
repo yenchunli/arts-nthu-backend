@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	db "github.com/yenchunli/arts-nthu-backend/db"
-	"github.com/yenchunli/arts-nthu-backend/util"
 	"github.com/yenchunli/arts-nthu-backend/server"
+	"github.com/yenchunli/arts-nthu-backend/util"
 	"log"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
-	
+
 	conn, err := sql.Open(config.DBDriver, psqlInfo)
 
 	if err != nil {

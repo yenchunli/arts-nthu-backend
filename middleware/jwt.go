@@ -3,10 +3,10 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"strings"
 	"github.com/gin-gonic/gin"
 	"github.com/yenchunli/arts-nthu-backend/pkg/token"
+	"net/http"
+	"strings"
 )
 
 const (

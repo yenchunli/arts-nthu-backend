@@ -1,10 +1,10 @@
 package upload
 
 import (
-	"testing"
-	"os"
 	"io/ioutil"
+	"os"
 	"regexp"
+	"testing"
 )
 
 // Test if upload a nil image, it should return error

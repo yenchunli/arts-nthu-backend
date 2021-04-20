@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/yenchunli/arts-nthu-backend/pkg/upload"
 	"io/ioutil"
-	"os"
 	"mime/multipart"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -24,9 +24,8 @@ func main() {
 			return
 		}
 
-
-		file, err := c.FormFile("image") 	// *Multipart.FileHeader
-		if file.Size <=0 {
+		file, err := c.FormFile("image") // *Multipart.FileHeader
+		if file.Size <= 0 {
 			c.JSON(500, gin.H{
 				"message": err.Error(),
 			})
@@ -37,14 +36,14 @@ func main() {
 			})
 		}
 
-		reader, err := file.Open()			// io.Reader
+		reader, err := file.Open() // io.Reader
 		if err != nil {
 			c.JSON(500, gin.H{
 				"message": err.Error(),
 			})
 		}
 
-		buf, err := ioutil.ReadAll(reader)	// bytes[]
+		buf, err := ioutil.ReadAll(reader) // bytes[]
 		if err != nil {
 			c.JSON(500, gin.H{
 				"message": err.Error(),
@@ -54,12 +53,11 @@ func main() {
 		client := upload.NewClient(os.Getenv("IMGUR_UPLOAD_TOKEN"), "https://api.imgur.com/3/upload")
 		imgurUrl, _ := client.UploadImage(buf)
 
-
 		c.JSON(200, gin.H{
 			"url": imgurUrl,
 		})
 		return
 	})
-	r.Run() 
-	
+	r.Run()
+
 }

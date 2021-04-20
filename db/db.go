@@ -231,7 +231,7 @@ func (db *DB) CreateExhibition(arg store.CreateExhibitionParams) (store.Exhibiti
 	return e, err
 }
 
-func (db *DB) EditExhibitions(arg store.EditExhibitionParams) (store.Exhibition, error) {
+func (db *DB) EditExhibition(arg store.EditExhibitionParams) (store.Exhibition, error) {
 
 	const command = `
 	UPDATE exhibitions
@@ -523,7 +523,7 @@ func (db *DB) CreateNews(arg store.CreateNewsParams) (store.News, error) {
 		currentTime,
 		currentTime,
 	)
-	
+
 	var n store.News
 
 	err := row.Scan(

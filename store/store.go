@@ -4,7 +4,7 @@ type Store interface {
 	ListExhibitions(arg ListExhibitionsParams) ([]Exhibition, error)
 	GetExhibition(id int) (Exhibition, error)
 	CreateExhibition(arg CreateExhibitionParams) (Exhibition, error)
-	EditExhibitions(arg EditExhibitionParams) (Exhibition, error)
+	EditExhibition(arg EditExhibitionParams) (Exhibition, error)
 	DeleteExhibition(id int) error
 	GetExhibitionsMaxSize() (int, error)
 

@@ -5,21 +5,11 @@ import (
 	//"fmt"
 	"github.com/gin-gonic/gin"
 	store "github.com/yenchunli/arts-nthu-backend/store"
-	"github.com/yenchunli/arts-nthu-backend/pkg/token"
 	"github.com/yenchunli/arts-nthu-backend/util"
 	"net/http"
 )
-type UserSvc struct {
-	store      store.Store
-	tokenMaker token.Maker
-	config     util.Config
-}
 
-func NewUserSvc(store store.Store, tokenMaker token.Maker, config util.Config) *UserSvc {
-	return &UserSvc{store: store, tokenMaker: tokenMaker, config: config}
-}
-
-func (svc *UserSvc) Create(ctx *gin.Context) {
+func (server *Server) CreateUser(ctx *gin.Context) {
 	type request struct {
 		Username string `json:"username" binding:"required,alphanum"`
 		Password string `json:"password" binding:"required,min=6"`
@@ -51,8 +41,8 @@ func (svc *UserSvc) Create(ctx *gin.Context) {
 		FullName:       req.FullName,
 		Email:          req.Email,
 	}
-	
-	user, err := svc.store.CreateUser(arg)
+
+	user, err := server.store.CreateUser(arg)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -63,7 +53,7 @@ func (svc *UserSvc) Create(ctx *gin.Context) {
 	return
 }
 
-func (svc *UserSvc) Login(ctx *gin.Context) {
+func (server *Server) Login(ctx *gin.Context) {
 	type request struct {
 		Username string `json:"username" binding:"required,alphanum"`
 		Password string `json:"password" binding:"required,min=6"`
@@ -79,7 +69,7 @@ func (svc *UserSvc) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := svc.store.GetUser(req.Username)
+	user, err := server.store.GetUser(req.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -95,9 +85,9 @@ func (svc *UserSvc) Login(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := svc.tokenMaker.CreateToken(
+	accessToken, err := server.tokenMaker.CreateToken(
 		user.Username,
-		svc.config.AccessTokenDuration,
+		server.config.AccessTokenDuration,
 	)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -111,4 +101,3 @@ func (svc *UserSvc) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 	return
 }
-

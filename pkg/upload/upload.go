@@ -1,45 +1,45 @@
 package upload
 
 import (
-	"net/http"
-	"io/ioutil"
 	"bytes"
-	"io"
-	"mime/multipart"
 	"encoding/json"
 	"errors"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
 )
 
 type Client struct {
-	token string
+	token        string
 	uploadApiUrl string
 }
 
-func NewClient(token string, uploadApiUrl string) *Client{
+func NewClient(token string, uploadApiUrl string) *Client {
 	return &Client{token: token, uploadApiUrl: uploadApiUrl}
 }
 
-func (client *Client) UploadImage(image []byte) (string, error){
+func (client *Client) UploadImage(image []byte) (string, error) {
 
 	if image == nil {
 		return "", errors.New("No Image")
 	}
 	var buf = new(bytes.Buffer)
-    writer := multipart.NewWriter(buf)
+	writer := multipart.NewWriter(buf)
 
-    part, _ := writer.CreateFormFile("image", "filename")
+	part, _ := writer.CreateFormFile("image", "filename")
 
 	imgReader := bytes.NewReader(image)
-    io.Copy(part, imgReader)
+	io.Copy(part, imgReader)
 
-    writer.Close()
-    req, _ := http.NewRequest("POST", client.uploadApiUrl, buf)
-    req.Header.Set("Content-Type", writer.FormDataContentType())
-    req.Header.Set("Authorization", "Bearer "+client.token)
+	writer.Close()
+	req, _ := http.NewRequest("POST", client.uploadApiUrl, buf)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+client.token)
 
-    res, _ := http.DefaultClient.Do(req)
-    defer res.Body.Close()
-    body, _ := ioutil.ReadAll(res.Body)
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
 
 	dec := json.NewDecoder(bytes.NewReader(body))
 	var img imageInfoDataWrapper
@@ -50,6 +50,6 @@ func (client *Client) UploadImage(image []byte) (string, error){
 	if !img.Success {
 		return "", errors.New("Fail")
 	}
-    
+
 	return img.Data.Link, nil
 }

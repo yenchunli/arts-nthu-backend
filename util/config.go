@@ -33,3 +33,17 @@ func LoadConfig(path string) (config Config, err error) {
 
 	return
 }
+
+func LoadTestConfig() Config {
+	var config Config
+	config.DBDriver = "postgres"
+	config.DBHost = "0.0.0.0"
+	config.DBPort = "5432"
+	config.DBUser = "hello"
+	config.DBPassword = "Hello123@"
+	config.DBName = "hello"
+	config.ServerAddress = "0.0.0.0:8080"
+	config.JWTTokenKey = "12345678901234567890123456789012"
+	config.AccessTokenDuration = time.Minute * 30
+	return config
+}
