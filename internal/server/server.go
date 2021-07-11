@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/yenchunli/arts-nthu-backend/middleware"
+	"github.com/yenchunli/arts-nthu-backend/internal/middleware"
 	"github.com/yenchunli/arts-nthu-backend/pkg/token"
 	store "github.com/yenchunli/arts-nthu-backend/store"
 	"github.com/yenchunli/arts-nthu-backend/util"

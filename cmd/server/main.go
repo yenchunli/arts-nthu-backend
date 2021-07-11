@@ -3,10 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	db "github.com/yenchunli/arts-nthu-backend/db"
-	"github.com/yenchunli/arts-nthu-backend/server"
-	"github.com/yenchunli/arts-nthu-backend/util"
 	"log"
+
+	db "github.com/yenchunli/arts-nthu-backend/internal/postgres"
+	"github.com/yenchunli/arts-nthu-backend/internal/server"
+	"github.com/yenchunli/arts-nthu-backend/util"
 )
 
 func main() {
