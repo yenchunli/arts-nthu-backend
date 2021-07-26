@@ -63,7 +63,6 @@ func (server *Server) NewRouter() *gin.Engine {
 		apiv1.GET("/news", server.ListNews)
 		apiv1.GET("/news/:id", server.GetNews)
 
-		apiv1.POST("/users", server.CreateUser)
 		apiv1.POST("/users/login", server.Login)
 	}
 
@@ -78,6 +77,9 @@ func (server *Server) NewRouter() *gin.Engine {
 		apiv1_auth.DELETE("/news/:id", server.DeleteNews)
 
 		apiv1_auth.POST("/upload", server.UploadImage)
+
+		apiv1_auth.POST("/users", server.CreateUser)
+		apiv1_auth.POST("/users/info", server.CreateUser)
 	}
 
 	return r
