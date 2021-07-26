@@ -402,7 +402,7 @@ func (db *DB) GetUserByEmail(email string) (store.User, error) {
 	SELECT username, hashed_password, full_name, email, password_change_at, create_at FROM users
 	WHERE email = $1 LIMIT 1
 	`
-	row := db.conn.QueryRow(command, username)
+	row := db.conn.QueryRow(command, email)
 	var user store.User
 	err := row.Scan(
 		&user.Username,
