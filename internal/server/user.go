@@ -55,7 +55,7 @@ func (server *Server) CreateUser(ctx *gin.Context) {
 
 func (server *Server) Login(ctx *gin.Context) {
 	type request struct {
-		Email string `json:"email" binding:"required"`
+		Email    string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required,min=6"`
 	}
 	type response struct {
@@ -89,7 +89,7 @@ func (server *Server) Login(ctx *gin.Context) {
 		user.Username,
 		server.config.AccessTokenDuration,
 	)
-	if err != nil { 
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -100,4 +100,25 @@ func (server *Server) Login(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, res)
 	return
+}
+
+func (server *Server) Info(ctx *gin.Context) {
+
+	type response struct {
+		Role         string `json:"role"`
+		Introduction string `json:"introduction"`
+		Avatar       string `json:"avatar"`
+		Name         string `json:"name"`
+	}
+
+	res := response{
+		Role:         "admin",
+		Introduction: "",
+		Avatar:       "",
+		Name:         "",
+	}
+
+	ctx.JSON(http.StatusOK, res)
+	return
+
 }
