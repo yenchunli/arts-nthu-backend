@@ -104,21 +104,12 @@ func (server *Server) Login(ctx *gin.Context) {
 
 func (server *Server) Info(ctx *gin.Context) {
 
-	type response struct {
-		Role         string `json:"role"`
-		Introduction string `json:"introduction"`
-		Avatar       string `json:"avatar"`
-		Name         string `json:"name"`
-	}
-
-	res := response{
-		Role:         "admin",
-		Introduction: "",
-		Avatar:       "",
-		Name:         "",
-	}
-
-	ctx.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, gin.H{
+		"role": "admin",
+		"introduction": "",
+		"avatar": "",
+		"name": "",
+	})
 	return
 
 }

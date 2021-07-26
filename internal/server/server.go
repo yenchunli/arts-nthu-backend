@@ -79,7 +79,8 @@ func (server *Server) NewRouter() *gin.Engine {
 		apiv1_auth.POST("/upload", server.UploadImage)
 
 		apiv1_auth.POST("/users", server.CreateUser)
-		apiv1_auth.POST("/users/info", server.CreateUser)
+		apiv1_auth.GET("/users/info", server.Info)
+		
 	}
 
 	return r
