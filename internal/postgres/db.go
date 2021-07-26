@@ -397,6 +397,24 @@ func (db *DB) GetUser(username string) (store.User, error) {
 	return user, err
 }
 
+func (db *DB) GetUserByEmail(email string) (store.User, error) {
+	const command = `
+	SELECT username, hashed_password, full_name, email, password_change_at, create_at FROM users
+	WHERE email = $1 LIMIT 1
+	`
+	row := db.conn.QueryRow(command, username)
+	var user store.User
+	err := row.Scan(
+		&user.Username,
+		&user.HashedPassword,
+		&user.FullName,
+		&user.Email,
+		&user.PasswordChangeAt,
+		&user.CreateAt,
+	)
+	return user, err
+}
+
 func (db *DB) ListNews(arg store.ListNewsParams) ([]store.News, error) {
 	var command string
 	var err error

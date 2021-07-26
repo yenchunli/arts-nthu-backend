@@ -55,7 +55,7 @@ func (server *Server) CreateUser(ctx *gin.Context) {
 
 func (server *Server) Login(ctx *gin.Context) {
 	type request struct {
-		Username string `json:"username" binding:"required,alphanum"`
+		Email string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required,min=6"`
 	}
 	type response struct {
@@ -69,7 +69,7 @@ func (server *Server) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := server.store.GetUser(req.Username)
+	user, err := server.store.GetUserByEmail(req.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
