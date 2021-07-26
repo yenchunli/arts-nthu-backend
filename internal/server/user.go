@@ -69,7 +69,7 @@ func (server *Server) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := server.store.GetUserByEmail(req.Username)
+	user, err := server.store.GetUserByEmail(req.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -89,7 +89,7 @@ func (server *Server) Login(ctx *gin.Context) {
 		user.Username,
 		server.config.AccessTokenDuration,
 	)
-	if err != nil {
+	if err != nil { 
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
