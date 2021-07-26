@@ -65,7 +65,6 @@ func (server *Server) NewRouter() *gin.Engine {
 
 		apiv1.POST("/users/login", server.Login)
 
-		apiv1.GET("/users/info", server.Info)
 	}
 
 	apiv1_auth := r.Group("/api/v1").Use(middleware.JWT(server.tokenMaker))
@@ -81,7 +80,7 @@ func (server *Server) NewRouter() *gin.Engine {
 		apiv1_auth.POST("/upload", server.UploadImage)
 
 		apiv1_auth.POST("/users", server.CreateUser)
-		
+		apiv1_auth.GET("/users/info", server.Info)
 		
 	}
 
