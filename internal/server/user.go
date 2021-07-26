@@ -105,7 +105,7 @@ func (server *Server) Login(ctx *gin.Context) {
 func (server *Server) Info(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"role": []string{"admin"},
+		"roles": []string{"admin"},
 		"introduction": "",
 		"avatar": "",
 		"name": "",
